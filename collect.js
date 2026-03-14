@@ -241,15 +241,12 @@ const SEARCH_TERMS = [
 const MAX_PAGES_PER_TERM = 10
 const MAX_RESULTS = 10000
 
-function normalizeUrl (rawUrl) {
+function normalizeUrl(rawUrl) {
   try {
     const url = new URL(rawUrl)
+    url.hash = ""
 
-    // remove hash
-    url.hash = ''
-
-    // normalize trailing slash
-    if (url.pathname.endsWith('/') && url.pathname !== '/') {
+    if (url.pathname.endsWith("/") && url.pathname !== "/") {
       url.pathname = url.pathname.slice(0, -1)
     }
 
@@ -270,77 +267,102 @@ function shuffleArray(array) {
   return copy
 }
 
-function looksBad (url) {
+function looksBad(url) {
   const badWords = [
-    'porn',
-    'sex',
-    'xxx',
-    'viagra',
-    'drugs',
-    'nude',
-    'guns',
-    'weapon',
-    'adult'
+    "porn",
+    "sex",
+    "xxx",
+    "viagra",
+    "drugs",
+    "nude",
+    "guns",
+    "weapon",
+    "adult"
   ]
 
   const lower = url.toLowerCase()
   return badWords.some(word => lower.includes(word))
 }
 
-async function fetchWibyResults (query, page = 1) {
-  const apiUrl = `https://wiby.me/json/?q=${encodeURIComponent(
-    query
-  )}&p=${page}`
+async function isAliveHtml(url) {
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 8000)
 
-  const res = await fetch(apiUrl, {
-    headers: {
-      'User-Agent': 'old-web-randomizer/1.0'
-    }
-  })
+    const res = await fetch(url, {
+      method: "GET",
+      redirect: "follow",
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "retro-web-randomizer/1.0"
+      }
+    })
 
-  if (!res.ok) {
-    throw new Error(`Wiby request failed: ${res.status}`)
+    clearTimeout(timeout)
+
+    if (!res.ok) return false
+
+    const contentType = res.headers.get("content-type") || ""
+
+    if (!contentType.includes("text/html")) return false
+
+    return true
+  } catch {
+    return false
   }
+}
+
+async function fetchWibyResults(query, page = 1) {
+  const apiUrl = `https://wiby.me/json/?q=${encodeURIComponent(query)}&p=${page}`
+
+  const res = await fetch(apiUrl)
+
+  if (!res.ok) throw new Error(`Wiby error ${res.status}`)
 
   const data = await res.json()
 
-  // Wiby result shape can vary a bit, so handle flexibly
-  if (!Array.isArray(data)) {
-    return []
-  }
+  if (!Array.isArray(data)) return []
 
   return data
     .map(item => item.URL || item.url || item.Link || item.link)
     .filter(Boolean)
 }
 
-async function gatherCandidates () {
+async function gatherCandidates() {
   const uniqueUrls = new Set()
   const terms = shuffleArray(SEARCH_TERMS)
 
   for (const term of terms) {
     for (let page = 1; page <= MAX_PAGES_PER_TERM; page++) {
+      console.log(`Searching Wiby: "${term}" page ${page}`)
+
       try {
-        console.log(`Searching Wiby: "${term}" page ${page}`)
         const urls = await fetchWibyResults(term, page)
 
-        if (urls.length === 0) {
-          break
-        }
+        if (urls.length === 0) break
 
         for (const rawUrl of urls) {
           const normalized = normalizeUrl(rawUrl)
+
           if (!normalized) continue
           if (looksBad(normalized)) continue
 
+          if (uniqueUrls.has(normalized)) continue
+
+          const alive = await isAliveHtml(normalized)
+
+          if (!alive) continue
+
           uniqueUrls.add(normalized)
+
+          console.log("✓", normalized)
 
           if (uniqueUrls.size >= MAX_RESULTS) {
             return [...uniqueUrls]
           }
         }
       } catch (error) {
-        console.log(`Failed on "${term}" page ${page}: ${error.message}`)
+        console.log(`Failed "${term}" page ${page}:`, error.message)
       }
     }
   }
@@ -348,19 +370,15 @@ async function gatherCandidates () {
   return [...uniqueUrls]
 }
 
-async function main () {
+async function main() {
   const candidates = await gatherCandidates()
 
   await fs.writeFile(
-    'candidates.json',
-    JSON.stringify(candidates, null, 2),
-    'utf8'
+    "relics.json",
+    JSON.stringify(candidates.map(url => ({ url })), null, 2)
   )
 
-  console.log(`Saved ${candidates.length} candidate URLs to candidates.json`)
+  console.log(`Saved ${candidates.length} working relic websites`)
 }
 
-main().catch(err => {
-  console.error(err)
-  process.exit(1)
-})
+main()

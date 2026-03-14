@@ -1,49 +1,134 @@
+@font-face {
+  font-family: "Relic-Regular";
+  src: url("./Relic-Regular.otf") format("opentype");
+}
+
+/* reset */
+
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
+
   font-family: Arial, sans-serif;
-  background: #111;
+
+  background: radial-gradient(circle at center, #1b1b1b, #0d0d0d);
+
   color: #f5f5f5;
+
   min-height: 100vh;
-  display: grid;
-  place-items: center;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: flex-start;
+
+  padding-top: 120px;
+
 }
+
+/* layout */
 
 .container {
-  width: min(90%, 700px);
+
   text-align: center;
-  padding: 2rem;
+
+  max-width: 700px;
+
+  padding: 40px;
 }
 
-h1 {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
+/* title */
+
+.title {
+
+  font-family: "Relic-Regular", serif;
+
+  font-size: 72px;
+
+  text-align: center;
+
+  line-height: 1.05;
+
+  line-height: 1.2;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
 }
+
+.title span {
+  display: block;
+}
+
+
+.title span:nth-child(2) {
+
+  font-size: 40px;
+
+  letter-spacing: 2px;
+
+}
+
+/* subtitle */
 
 .subtitle {
-  color: #bdbdbd;
-  margin-bottom: 2rem;
-  line-height: 1.5;
+
+  color: #b8b8b8;
+
+  margin-bottom: 40px;
+
+  font-size: 18px;
 }
 
-button {
-  border: none;
-  background: #f5f5f5;
+/* vintage button */
+
+.relic-btn {
+
+  font-size: 20px;
+
+  padding: 20px 40px;
+
+  background: #e6e6e6;
+
   color: #111;
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 12px;
+
+  border: 3px solid #111;
+
+  border-radius: 2px;
+
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+
+  font-weight: bold;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  transition: all 0.15s ease;
+
+  box-shadow:
+    6px 6px 0 #000;
 }
 
-button:hover {
-  transform: scale(1.04);
+/* hover */
+
+.relic-btn:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    8px 8px 0 #000;
 }
 
-button:active {
-  transform: scale(0.98);
+/* click */
+
+.relic-btn:active {
+
+  transform: translateY(4px);
+
+  box-shadow:
+    2px 2px 0 #000;
 }

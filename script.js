@@ -30,7 +30,7 @@ const taglines = [
 
 "Early 2000s Web Vibes",
 
-"Where Abandoned Websites Live On",
+"Where Abandoned Sites Live On",
 
 "Its Legacy Still Lives On",
 

@@ -201,6 +201,7 @@ body {
 
 .back-link {
   margin-top: 40px;
+  color: #f5f5f5;
 }
 
 /* mobile adjustments */
@@ -235,6 +236,10 @@ body {
   .relic-btn {
     font-size: 20px;
     padding: 16px 28px;
+  }
+
+  .report-body {
+    padding: 10px;
   }
 
 }

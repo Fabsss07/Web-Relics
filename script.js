@@ -113,6 +113,10 @@ randomBtn.addEventListener("click", () => {
     const curatedIndex = Math.floor(Math.random() * curatedSites.length)
     const curatedUrl = curatedSites[curatedIndex]
 
+    if (window.umami) {
+      window.umami.track("random_click")
+    }
+
     window.open(curatedUrl, "_blank", "noopener,noreferrer")
     return
   }
@@ -131,6 +135,10 @@ randomBtn.addEventListener("click", () => {
 
   if (history.length > 1000) {
     history.shift()
+  }
+
+  if (window.umami) {
+    window.umami.track("random_click")
   }
 
   window.open(website.url, "_blank", "noopener,noreferrer")
